@@ -36,3 +36,8 @@ adapters:
     schema: "service"
     username: "postgres"
     password: "postgres"
+
+logging:
+  level:
+    root: INFO
+    co.com.tecnohalecatez: TRACE
