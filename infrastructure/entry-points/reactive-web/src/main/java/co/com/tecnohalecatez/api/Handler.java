@@ -1,6 +1,7 @@
 package co.com.tecnohalecatez.api;
 
-import co.com.tecnohalecatez.model.user.User;
+import co.com.tecnohalecatez.api.dto.UserDTO;
+import co.com.tecnohalecatez.api.mapper.UserDTOMapper;
 import co.com.tecnohalecatez.usecase.user.UserUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -16,29 +17,30 @@ import java.math.BigInteger;
 public class Handler {
 
     private final UserUseCase userUseCase;
+    private final UserDTOMapper userDTOMapper;
 
     public Mono<ServerResponse> listenSaveUser(ServerRequest serverRequest) {
-        return serverRequest.bodyToMono(User.class)
-                .flatMap(userUseCase::saveUser)
+        return serverRequest.bodyToMono(UserDTO.class)
+                .flatMap(userDTO -> userUseCase.saveUser(userDTOMapper.toModel(userDTO)))
                 .flatMap(savedUser -> ServerResponse.ok()
                         .contentType(MediaType.APPLICATION_JSON)
-                        .bodyValue(savedUser));
+                        .bodyValue(userDTOMapper.toResponse(savedUser)));
     }
 
     public Mono<ServerResponse> listenGetUserById(ServerRequest serverRequest) {
         return userUseCase.getUserById(new BigInteger(serverRequest.pathVariable("id")))
                 .flatMap(user -> ServerResponse.ok()
                         .contentType(MediaType.APPLICATION_JSON)
-                        .bodyValue(user))
+                        .bodyValue(userDTOMapper.toResponse(user)))
                 .switchIfEmpty(ServerResponse.notFound().build());
     }
 
     public Mono<ServerResponse> listenUpdateUser(ServerRequest serverRequest) {
-        return serverRequest.bodyToMono(User.class)
-                .flatMap(userUseCase::updateUser)
+        return serverRequest.bodyToMono(UserDTO.class)
+                .flatMap(userDTO -> userUseCase.updateUser(userDTOMapper.toModel(userDTO)))
                 .flatMap(updatedUser -> ServerResponse.ok()
                         .contentType(MediaType.APPLICATION_JSON)
-                        .bodyValue(updatedUser));
+                        .bodyValue(userDTOMapper.toResponse(updatedUser)));
     }
 
     public Mono<ServerResponse> listenDeleteUserById(ServerRequest serverRequest) {
@@ -49,7 +51,7 @@ public class Handler {
     public Mono<ServerResponse> listenGetAllUsers(ServerRequest serverRequest) {
         return ServerResponse.ok()
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(userUseCase.findAllUsers(), User.class);
+                .body(userDTOMapper.toResponseFlux(userUseCase.findAllUsers()), UserDTO.class);
     }
 
 }

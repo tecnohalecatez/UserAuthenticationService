@@ -12,12 +12,8 @@ import reactor.core.publisher.Mono;
 import java.math.BigInteger;
 
 @Repository
-public class UserRepositoryAdapter extends ReactiveAdapterOperations<
-        User,
-        UserEntity,
-        BigInteger,
-        UserReactiveRepository
-        > implements UserRepository {
+public class UserRepositoryAdapter extends ReactiveAdapterOperations<User, UserEntity,
+        BigInteger, UserReactiveRepository> implements UserRepository {
     public UserRepositoryAdapter(UserReactiveRepository repository, ObjectMapper mapper) {
         super(repository, mapper, entity -> mapper.map(entity, User.class));
     }
