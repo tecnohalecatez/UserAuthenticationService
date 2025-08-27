@@ -5,6 +5,7 @@ import co.com.tecnohalecatez.model.user.gateways.UserRepository;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
 import java.math.BigInteger;
 
 @RequiredArgsConstructor
@@ -31,4 +32,5 @@ public class UserUseCase {
     public Flux<User> findAllUsers() {
         return userRepository.findAll();
     }
+
 }

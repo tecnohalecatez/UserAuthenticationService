@@ -56,4 +56,5 @@ public class UserRepositoryAdapter extends ReactiveAdapterOperations<
     public Flux<User> findAll() {
         return super.findAll();
     }
+
 }

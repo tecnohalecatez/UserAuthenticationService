@@ -19,4 +19,5 @@ public class RouterRest {
                 .andRoute(DELETE(userPath.getUsersById()), handler::listenDeleteUserById)
                 .andRoute(GET(userPath.getUsers()), handler::listenGetAllUsers);
     }
+
 }
