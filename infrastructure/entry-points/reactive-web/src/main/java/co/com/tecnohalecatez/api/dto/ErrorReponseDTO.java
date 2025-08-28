@@ -6,6 +6,5 @@ public record ErrorReponseDTO(
         String timestamp,
         int status,
         String error,
-        String path,
-        List<String> messages) {
+        String message) {
 }

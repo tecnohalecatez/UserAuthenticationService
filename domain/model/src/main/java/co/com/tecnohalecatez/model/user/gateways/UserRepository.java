@@ -11,8 +11,6 @@ public interface UserRepository {
 
     Mono<User> findById(BigInteger id);
 
-    Mono<User> update(User user);
-
     Mono<Void> deleteById(BigInteger id);
 
     Flux<User> findAll();

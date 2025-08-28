@@ -21,10 +21,6 @@ public class UserUseCase {
         return userRepository.findById(id);
     }
 
-    public Mono<User> updateUser(User user) {
-        return userRepository.update(user);
-    }
-
     public Mono<Void> deleteUserById(BigInteger id) {
         return userRepository.deleteById(id);
     }
