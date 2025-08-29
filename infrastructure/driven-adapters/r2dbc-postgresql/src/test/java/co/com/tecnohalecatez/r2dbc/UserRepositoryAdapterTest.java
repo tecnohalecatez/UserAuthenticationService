@@ -47,15 +47,16 @@ class UserRepositoryAdapterTest {
                 .baseSalary(50000.0)
                 .build();
 
-        testUserEntity = new UserEntity();
-        testUserEntity.setId(BigInteger.ONE);
-        testUserEntity.setName("John");
-        testUserEntity.setSurname("Doe");
-        testUserEntity.setBirthDate(LocalDate.of(1990, 1, 1));
-        testUserEntity.setAddress("123 Main St");
-        testUserEntity.setPhone("555-1234");
-        testUserEntity.setEmail("john.doe@example.com");
-        testUserEntity.setBaseSalary(50000.0);
+        testUserEntity = UserEntity.builder()
+                .id(BigInteger.ONE)
+                .name("John")
+                .surname("Doe")
+                .birthDate(LocalDate.of(1990, 1, 1))
+                .address("123 Main St")
+                .phone("555-1234")
+                .email("john.doe@example.com")
+                .baseSalary(50000.0)
+                .build();
     }
 
     @Test
@@ -133,5 +134,37 @@ class UserRepositoryAdapterTest {
         StepVerifier.create(result)
                 .expectNext(false)
                 .verifyComplete();
+    }
+
+    @Test
+    void findById_ShouldReturnEmpty() {
+        when(repository.findById(BigInteger.valueOf(999))).thenReturn(Mono.empty());
+
+        Mono<User> result = repositoryAdapter.findById(BigInteger.valueOf(999));
+
+        StepVerifier.create(result)
+                .verifyComplete();
+    }
+
+    @Test
+    void findAll_ShouldReturnEmptyFlux() {
+        when(repository.findAll()).thenReturn(Flux.empty());
+
+        Flux<User> result = repositoryAdapter.findAll();
+
+        StepVerifier.create(result)
+                .verifyComplete();
+    }
+
+    @Test
+    void save_ShouldHandleError() {
+        when(mapper.map(testUser, UserEntity.class)).thenReturn(testUserEntity);
+        when(repository.save(any(UserEntity.class))).thenReturn(Mono.error(new RuntimeException("Database error")));
+
+        Mono<User> result = repositoryAdapter.save(testUser);
+
+        StepVerifier.create(result)
+                .expectError(RuntimeException.class)
+                .verify();
     }
 }
