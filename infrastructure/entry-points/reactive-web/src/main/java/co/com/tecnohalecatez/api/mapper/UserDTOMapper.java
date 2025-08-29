@@ -11,10 +11,6 @@ public interface UserDTOMapper {
 
     UserDTO toResponse(User user);
 
-    User toModel(UserDTO userDTO);
-
-    UserDataDTO toResponseData(User user);
-
     User toModel(UserDataDTO userDataDTO);
 
     default Flux<UserDTO> toResponseFlux(Flux<User> users) {

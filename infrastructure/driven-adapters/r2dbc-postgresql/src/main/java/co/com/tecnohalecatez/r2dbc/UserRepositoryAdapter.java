@@ -52,4 +52,12 @@ public class UserRepositoryAdapter extends ReactiveAdapterOperations<User, UserE
         return super.findAll();
     }
 
+    @Override
+    public Mono<Boolean> existsByEmail(String email) {
+        log.trace("Start checking existence of user by email = {}", email);
+        return repository.existsByEmail(email)
+                .doOnSuccess(exists -> log.trace("Existence check for email = {} -> {}", email, exists))
+                .doOnError(e -> log.error("Error checking existence of email = {} -> {}", email, e.getMessage(), e));
+    }
+
 }
