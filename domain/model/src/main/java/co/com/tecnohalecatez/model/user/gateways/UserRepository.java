@@ -15,4 +15,6 @@ public interface UserRepository {
 
     Flux<User> findAll();
 
+    Mono<Boolean> existsByEmail(String email);
+
 }

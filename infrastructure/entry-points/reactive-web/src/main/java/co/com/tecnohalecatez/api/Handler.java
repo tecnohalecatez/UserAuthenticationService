@@ -40,11 +40,17 @@ public class Handler {
                     if (errors.hasErrors()) {
                         return Mono.error(new UserDataException(UserConstant.INVALID_USER_DATA));
                     }
-                    return userUseCase.saveUser(userDTOMapper.toModel(userDataDTO));
+                    return userUseCase.existsByEmail(userDataDTO.email())
+                            .flatMap(exists -> {
+                                if (exists) {
+                                    return Mono.error(new UserDataException(UserConstant.INVALID_USER_DATA));
+                                }
+                                return userUseCase.saveUser(userDTOMapper.toModel(userDataDTO));
+                            });
                 })
                 .flatMap(savedUser -> ServerResponse.status(HttpStatus.CREATED)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .bodyValue(userDTOMapper.toResponseData(savedUser)))
+                        .bodyValue(userDTOMapper.toResponse(savedUser)))
                 .onErrorResume(UserDataException.class, e -> {
                     ErrorReponseDTO errorResponse = new ErrorReponseDTO(
                             Instant.now().toString(),
@@ -79,7 +85,7 @@ public class Handler {
                         })
                         .flatMap(updatedUser -> ServerResponse.ok()
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .bodyValue(userDTOMapper.toResponseData(updatedUser))
+                                .bodyValue(userDTOMapper.toResponse(updatedUser))
                         )
                 )
                 .switchIfEmpty(Mono.error(new UserNotFoundException("User not found")))
