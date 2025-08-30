@@ -2,7 +2,7 @@ server:
   port: 9090
 spring:
   application:
-    name: "UserRegistrationService"
+    name: "UserAuthenticationService"
   devtools:
     add-properties: false
   h2:
