@@ -1,7 +1,7 @@
 package co.com.tecnohalecatez.api.config;
 
-import co.com.tecnohalecatez.api.Handler;
-import co.com.tecnohalecatez.api.RouterRest;
+import co.com.tecnohalecatez.api.UserHandler;
+import co.com.tecnohalecatez.api.UserRouterRest;
 import co.com.tecnohalecatez.api.mapper.UserDTOMapper;
 import co.com.tecnohalecatez.model.user.User;
 import co.com.tecnohalecatez.usecase.user.UserUseCase;
@@ -21,7 +21,7 @@ import java.time.LocalDate;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
-@ContextConfiguration(classes = {RouterRest.class, Handler.class, UserPath.class})
+@ContextConfiguration(classes = {UserRouterRest.class, UserHandler.class, UserPath.class})
 @WebFluxTest
 @Import({CorsConfig.class, SecurityHeadersConfig.class})
 class ConfigTest {

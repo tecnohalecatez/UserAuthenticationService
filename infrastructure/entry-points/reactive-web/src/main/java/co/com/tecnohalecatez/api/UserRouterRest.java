@@ -25,7 +25,7 @@ import static org.springframework.web.reactive.function.server.RequestPredicates
 import static org.springframework.web.reactive.function.server.RouterFunctions.route;
 
 @Configuration
-public class RouterRest {
+public class UserRouterRest {
 
     @Bean
     @RouterOperations({
@@ -33,7 +33,7 @@ public class RouterRest {
                     path = UserConstant.BASE_PATH,
                     produces = {MediaType.APPLICATION_JSON_VALUE},
                     method = RequestMethod.POST,
-                    beanClass = Handler.class,
+                    beanClass = UserHandler.class,
                     beanMethod = UserConstant.LISTEN + UserConstant.SAVE_USER,
                     operation = @Operation(
                             operationId = UserConstant.SAVE_USER,
@@ -80,7 +80,7 @@ public class RouterRest {
                     path = UserConstant.PATH_ID,
                     produces = {MediaType.APPLICATION_JSON_VALUE},
                     method = RequestMethod.GET,
-                    beanClass = Handler.class,
+                    beanClass = UserHandler.class,
                     beanMethod = UserConstant.LISTEN + UserConstant.GET_USER_ID,
                     operation = @Operation(
                             operationId = UserConstant.GET_USER_ID,
@@ -136,7 +136,7 @@ public class RouterRest {
                     path = UserConstant.BASE_PATH,
                     produces = {MediaType.APPLICATION_JSON_VALUE},
                     method = RequestMethod.PUT,
-                    beanClass = Handler.class,
+                    beanClass = UserHandler.class,
                     beanMethod = UserConstant.LISTEN + UserConstant.UPDATE_USER,
                     operation = @Operation(
                             operationId = UserConstant.UPDATE_USER,
@@ -191,7 +191,7 @@ public class RouterRest {
                     path = UserConstant.PATH_ID,
                     produces = {MediaType.APPLICATION_JSON_VALUE},
                     method = RequestMethod.DELETE,
-                    beanClass = Handler.class,
+                    beanClass = UserHandler.class,
                     beanMethod = UserConstant.LISTEN + UserConstant.DELETE_USER_ID,
                     operation = @Operation(
                             operationId = UserConstant.DELETE_USER_ID,
@@ -244,7 +244,7 @@ public class RouterRest {
                     path = UserConstant.BASE_PATH,
                     produces = {MediaType.APPLICATION_JSON_VALUE},
                     method = RequestMethod.GET,
-                    beanClass = Handler.class,
+                    beanClass = UserHandler.class,
                     beanMethod = UserConstant.LISTEN + UserConstant.GET_ALL_USERS,
                     operation = @Operation(
                             operationId = UserConstant.GET_ALL_USERS,
@@ -272,12 +272,12 @@ public class RouterRest {
                     )
             )
     })
-    public RouterFunction<ServerResponse> routerFunction(Handler handler, UserPath userPath) {
-        return route(POST(userPath.getUsers()), handler::listenSaveUser)
-                .andRoute(GET(userPath.getUsersById()), handler::listenGetUserById)
-                .andRoute(PUT(userPath.getUsersById()), handler::listenUpdateUser)
-                .andRoute(DELETE(userPath.getUsersById()), handler::listenDeleteUserById)
-                .andRoute(GET(userPath.getUsers()), handler::listenGetAllUsers);
+    public RouterFunction<ServerResponse> routerFunction(UserHandler userHandler, UserPath userPath) {
+        return route(POST(userPath.getUsers()), userHandler::listenSaveUser)
+                .andRoute(GET(userPath.getUsersById()), userHandler::listenGetUserById)
+                .andRoute(PUT(userPath.getUsersById()), userHandler::listenUpdateUser)
+                .andRoute(DELETE(userPath.getUsersById()), userHandler::listenDeleteUserById)
+                .andRoute(GET(userPath.getUsers()), userHandler::listenGetAllUsers);
     }
 
 }

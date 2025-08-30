@@ -15,10 +15,10 @@ import java.math.BigInteger;
 
 @Slf4j
 @Repository
-public class UserRepositoryAdapter extends ReactiveAdapterOperations<User, UserEntity,
+public class UserReactiveRepositoryAdapter extends ReactiveAdapterOperations<User, UserEntity,
         BigInteger, UserReactiveRepository> implements UserRepository {
 
-    public UserRepositoryAdapter(UserReactiveRepository repository, ObjectMapper mapper) {
+    public UserReactiveRepositoryAdapter(UserReactiveRepository repository, ObjectMapper mapper) {
         super(repository, mapper, entity -> mapper.map(entity, User.class));
     }
 
