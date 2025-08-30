@@ -1,91 +1,86 @@
 package co.com.tecnohalecatez.api;
 
-import co.com.tecnohalecatez.api.dto.UserDTO;
+import co.com.tecnohalecatez.api.config.UserPath;
 import co.com.tecnohalecatez.api.dto.UserDataDTO;
+import co.com.tecnohalecatez.api.mapper.UserDTOMapper;
 import co.com.tecnohalecatez.model.user.User;
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
+import co.com.tecnohalecatez.usecase.user.UserUseCase;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+
 @ContextConfiguration(classes = {RouterRest.class, Handler.class})
+@EnableConfigurationProperties(UserPath.class)
 @WebFluxTest
 class RouterRestTest {
 
     @Autowired
     private WebTestClient webTestClient;
 
-    @InjectMocks
+    @Autowired
+    private UserPath userPath;
+
+    @MockitoBean
+    private UserUseCase userUseCase;
+
+    @MockitoBean
     private Handler handler;
 
-    private User testUser;
-    private UserDTO testUserDTO;
-    private UserDataDTO testUserDataDTO;
+    @MockitoBean
+    private UserDTOMapper userDTOMapper;
 
-    @BeforeEach
-    void setUp() {
-        testUser = buildTestUser(BigInteger.ONE, "john.doe@example.com");
-        testUserDTO = buildTestUserDTO(BigInteger.ONE, "john.doe@example.com");
-        testUserDataDTO = buildTestUserDataDTO("john.doe@example.com");
-    }
+    private final User testUser = User.builder()
+            .id(BigInteger.ONE)
+            .name("John")
+            .surname("Doe")
+            .birthDate(LocalDate.of(1990, 1, 1))
+            .address("123 Main St")
+            .phone("555-1234")
+            .email("john.doe@example.com")
+            .baseSalary(50000.0)
+            .build();
 
-    private static User buildTestUser(BigInteger id, String email) {
-        return User.builder()
-                .id(id)
-                .name("John")
-                .surname("Doe")
-                .birthDate(LocalDate.of(1990, 1, 1))
-                .address("123 Main St")
-                .phone("555-1234")
-                .email(email)
-                .baseSalary(50000.0)
-                .build();
-    }
+    private final UserDataDTO testUserDataDTO = new UserDataDTO(
+            "John",
+            "Doe",
+            LocalDate.of(1990, 1, 1),
+            "123 Main St",
+            "555-1234",
+            "john.doe@example.com",
+            50000.0
+    );
 
-    private static UserDTO buildTestUserDTO(BigInteger id, String email) {
-        return new UserDTO(
-                id,
-                "John",
-                "Doe",
-                LocalDate.of(1990, 1, 1),
-                "123 Main St",
-                "555-1234",
-                email,
-                50000.0
-        );
-    }
+    private final String users = "/api/v1/users";
 
-    private static UserDataDTO buildTestUserDataDTO(String email) {
-        return new UserDataDTO(
-                "John",
-                "Doe",
-                LocalDate.of(1990, 1, 1),
-                "123 Main St",
-                "555-1234",
-                email,
-                50000.0
-        );
+    @Test
+    void shouldLoadUserPathProperties() {
+        assertEquals(users, userPath.getUsers());
+        assertEquals("/api/v1/users/{id}", userPath.getUsersById());
     }
 
     @Test
-    void listenSaveUser_ReturnsCreated() {
+    void listenSaveUserReturnsCreated() {
+        when(userUseCase.saveUser(any(User.class))).thenReturn(Mono.just(testUser));
         Mockito.when(handler.listenSaveUser(Mockito.any()))
-                .thenReturn(Mono.just(org.springframework.web.reactive.function.server.ServerResponse.created(null).build().block()));
-
+                .thenReturn(Mono.just(ServerResponse.created(null).build().block()));
         webTestClient.post()
-                .uri("/api/users")
+                .uri(users)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(testUserDataDTO)
                 .exchange()
@@ -93,81 +88,53 @@ class RouterRestTest {
     }
 
     @Test
-    void listenGetUserById_ReturnsUser() {
+    void listenGetUserByIdReturnsUser() {
+        when(userUseCase.getUserById(BigInteger.ONE)).thenReturn(Mono.just(testUser));
         Mockito.when(handler.listenGetUserById(Mockito.any()))
-                .thenReturn(Mono.just(org.springframework.web.reactive.function.server.ServerResponse.ok().build().block()));
+                .thenReturn(Mono.just(ServerResponse.ok().build().block()));
 
         webTestClient.get()
-                .uri("/api/users/1")
+                .uri("/api/v1/users/1")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk();
     }
 
     @Test
-    void listenGetUserById_ReturnsNotFound() {
+    void listenGetUserByIdReturnsNotFound() {
         Mockito.when(handler.listenGetUserById(Mockito.any()))
-                .thenReturn(Mono.just(org.springframework.web.reactive.function.server.ServerResponse.notFound().build().block()));
+                .thenReturn(Mono.just(ServerResponse.notFound().build().block()));
 
         webTestClient.get()
-                .uri("/api/users/999")
+                .uri("/api/v1/users/999")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isNotFound();
     }
 
     @Test
-    void listenDeleteUserById_ReturnsNoContent() {
+    void listenDeleteUserByIdReturnsNoContent() {
+        when(userUseCase.deleteUserById(BigInteger.ONE)).thenReturn(Mono.empty());
         Mockito.when(handler.listenDeleteUserById(Mockito.any()))
-                .thenReturn(Mono.just(org.springframework.web.reactive.function.server.ServerResponse.noContent().build().block()));
-
+                .thenReturn(Mono.just(ServerResponse.noContent().build().block()));
         webTestClient.delete()
-                .uri("/api/users/1")
+                .uri("/api/v1/users/1")
                 .exchange()
                 .expectStatus().isNoContent();
     }
 
     @Test
-    void listenGetAllUsers_ReturnsAllUsers() {
+    void listenGetAllUsersReturnsAllUsers() {
+        when(userUseCase.findAllUsers()).thenReturn(Flux.just(testUser));
         Mockito.when(handler.listenGetAllUsers(Mockito.any()))
-                .thenReturn(Mono.just(org.springframework.web.reactive.function.server.ServerResponse.ok().build().block()));
+                .thenReturn(Mono.just(ServerResponse.ok().build().block()));
 
         webTestClient.get()
-                .uri("/api/users")
+                .uri(users)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk();
     }
 
-    private void assertGetEndpoint(String uri) {
-        webTestClient.get()
-                .uri(uri)
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody(String.class)
-                .value(response -> Assertions.assertThat(response).isEmpty());
-    }
-
-    @Test
-    void listenGETUseCase_ReturnsOkAndEmptyBody() {
-        assertGetEndpoint("/api/usecase/path");
-    }
-
-    @Test
-    void listenGETOtherUseCase_ReturnsOkAndEmptyBody() {
-        assertGetEndpoint("/api/otherusercase/path");
-    }
-
-    @Test
-    void listenPOSTUseCase_ReturnsOkAndEmptyBody() {
-        webTestClient.post()
-                .uri("/api/usecase/otherpath")
-                .accept(MediaType.APPLICATION_JSON)
-                .bodyValue("")
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody(String.class)
-                .value(response -> Assertions.assertThat(response).isEmpty());
-    }
 }
+

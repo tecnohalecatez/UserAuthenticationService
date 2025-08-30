@@ -2,7 +2,6 @@ package co.com.tecnohalecatez.r2dbc;
 
 import co.com.tecnohalecatez.model.user.User;
 import co.com.tecnohalecatez.r2dbc.entity.UserEntity;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -22,21 +21,16 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class UserRepositoryAdapterTest {
 
+    @InjectMocks
+    private UserRepositoryAdapter repositoryAdapter;
+
     @Mock
     private UserReactiveRepository repository;
 
     @Mock
     private ObjectMapper mapper;
 
-    @InjectMocks
-    private UserRepositoryAdapter repositoryAdapter;
-
-    private User testUser;
-    private UserEntity testUserEntity;
-
-    @BeforeEach
-    void setUp() {
-        testUser = User.builder()
+    private final User testUser = User.builder()
                 .id(BigInteger.ONE)
                 .name("John")
                 .surname("Doe")
@@ -47,7 +41,7 @@ class UserRepositoryAdapterTest {
                 .baseSalary(50000.0)
                 .build();
 
-        testUserEntity = UserEntity.builder()
+    private final UserEntity testUserEntity = UserEntity.builder()
                 .id(BigInteger.ONE)
                 .name("John")
                 .surname("Doe")
@@ -57,10 +51,9 @@ class UserRepositoryAdapterTest {
                 .email("john.doe@example.com")
                 .baseSalary(50000.0)
                 .build();
-    }
 
     @Test
-    void save_ShouldReturnSavedUser() {
+    void saveShouldReturnSavedUser() {
         when(mapper.map(testUser, UserEntity.class)).thenReturn(testUserEntity);
         when(repository.save(any(UserEntity.class))).thenReturn(Mono.just(testUserEntity));
         when(mapper.map(testUserEntity, User.class)).thenReturn(testUser);
@@ -73,7 +66,7 @@ class UserRepositoryAdapterTest {
     }
 
     @Test
-    void findById_ShouldReturnUser() {
+    void findByIdShouldReturnUser() {
         when(repository.findById(BigInteger.ONE)).thenReturn(Mono.just(testUserEntity));
         when(mapper.map(testUserEntity, User.class)).thenReturn(testUser);
 
@@ -85,7 +78,7 @@ class UserRepositoryAdapterTest {
     }
 
     @Test
-    void deleteById_ShouldCompleteSuccessfully() {
+    void deleteByIdShouldCompleteSuccessfully() {
         when(repository.deleteById(BigInteger.ONE)).thenReturn(Mono.empty());
 
         Mono<Void> result = repositoryAdapter.deleteById(BigInteger.ONE);
@@ -95,7 +88,7 @@ class UserRepositoryAdapterTest {
     }
 
     @Test
-    void findAll_ShouldReturnAllUsers() {
+    void findAllShouldReturnAllUsers() {
         UserEntity userEntity2 = new UserEntity();
         userEntity2.setId(BigInteger.valueOf(2));
         userEntity2.setEmail("jane@example.com");
@@ -115,7 +108,7 @@ class UserRepositoryAdapterTest {
     }
 
     @Test
-    void existsByEmail_ShouldReturnTrue() {
+    void existsByEmailShouldReturnTrue() {
         when(repository.existsByEmail("john.doe@example.com")).thenReturn(Mono.just(true));
 
         Mono<Boolean> result = repositoryAdapter.existsByEmail("john.doe@example.com");
@@ -126,7 +119,7 @@ class UserRepositoryAdapterTest {
     }
 
     @Test
-    void existsByEmail_ShouldReturnFalse() {
+    void existsByEmailShouldReturnFalse() {
         when(repository.existsByEmail("nonexistent@example.com")).thenReturn(Mono.just(false));
 
         Mono<Boolean> result = repositoryAdapter.existsByEmail("nonexistent@example.com");
@@ -137,7 +130,7 @@ class UserRepositoryAdapterTest {
     }
 
     @Test
-    void findById_ShouldReturnEmpty() {
+    void findByIdShouldReturnEmpty() {
         when(repository.findById(BigInteger.valueOf(999))).thenReturn(Mono.empty());
 
         Mono<User> result = repositoryAdapter.findById(BigInteger.valueOf(999));
@@ -147,7 +140,7 @@ class UserRepositoryAdapterTest {
     }
 
     @Test
-    void findAll_ShouldReturnEmptyFlux() {
+    void findAllShouldReturnEmptyFlux() {
         when(repository.findAll()).thenReturn(Flux.empty());
 
         Flux<User> result = repositoryAdapter.findAll();
@@ -157,7 +150,7 @@ class UserRepositoryAdapterTest {
     }
 
     @Test
-    void save_ShouldHandleError() {
+    void saveShouldHandleError() {
         when(mapper.map(testUser, UserEntity.class)).thenReturn(testUserEntity);
         when(repository.save(any(UserEntity.class))).thenReturn(Mono.error(new RuntimeException("Database error")));
 
