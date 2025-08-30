@@ -8,7 +8,6 @@ import co.com.tecnohalecatez.api.exception.UserDataException;
 import co.com.tecnohalecatez.api.exception.UserNotFoundException;
 import co.com.tecnohalecatez.api.mapper.UserDTOMapper;
 import co.com.tecnohalecatez.usecase.user.UserUseCase;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -72,7 +71,7 @@ public class Handler {
                 .switchIfEmpty(ServerResponse.notFound().build());
     }
 
-    public Mono<ServerResponse> listenUpdateUser(@Valid ServerRequest serverRequest) {
+    public Mono<ServerResponse> listenUpdateUser(ServerRequest serverRequest) {
         return userUseCase.getUserById(new BigInteger(serverRequest.pathVariable("id")))
                 .flatMap(existingUser -> serverRequest.bodyToMono(UserDataDTO.class)
                         .flatMap(userDataDTO -> {
