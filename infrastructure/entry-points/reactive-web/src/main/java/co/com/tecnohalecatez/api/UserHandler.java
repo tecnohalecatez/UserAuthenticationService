@@ -41,7 +41,7 @@ public class UserHandler {
                     }
                     return userUseCase.existsByEmail(userDataDTO.email())
                             .flatMap(exists -> {
-                                if (exists) {
+                                if (Boolean.TRUE.equals(exists)) {
                                     return Mono.error(new UserDataException(UserConstant.INVALID_USER_DATA));
                                 }
                                 return userUseCase.saveUser(userDTOMapper.toModel(userDataDTO));
