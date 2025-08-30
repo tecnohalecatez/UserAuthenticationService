@@ -25,10 +25,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-@ContextConfiguration(classes = {RouterRest.class, Handler.class})
+@ContextConfiguration(classes = {UserRouterRest.class, UserHandler.class})
 @EnableConfigurationProperties(UserPath.class)
 @WebFluxTest
-class RouterRestTest {
+class UserRouterRestTest {
 
     @Autowired
     private WebTestClient webTestClient;
@@ -40,7 +40,7 @@ class RouterRestTest {
     private UserUseCase userUseCase;
 
     @MockitoBean
-    private Handler handler;
+    private UserHandler userHandler;
 
     @MockitoBean
     private UserDTOMapper userDTOMapper;
@@ -77,7 +77,7 @@ class RouterRestTest {
     @Test
     void listenSaveUserReturnsCreated() {
         when(userUseCase.saveUser(any(User.class))).thenReturn(Mono.just(testUser));
-        Mockito.when(handler.listenSaveUser(Mockito.any()))
+        Mockito.when(userHandler.listenSaveUser(Mockito.any()))
                 .thenReturn(Mono.just(ServerResponse.created(null).build().block()));
         webTestClient.post()
                 .uri(users)
@@ -90,7 +90,7 @@ class RouterRestTest {
     @Test
     void listenGetUserByIdReturnsUser() {
         when(userUseCase.getUserById(BigInteger.ONE)).thenReturn(Mono.just(testUser));
-        Mockito.when(handler.listenGetUserById(Mockito.any()))
+        Mockito.when(userHandler.listenGetUserById(Mockito.any()))
                 .thenReturn(Mono.just(ServerResponse.ok().build().block()));
 
         webTestClient.get()
@@ -102,7 +102,7 @@ class RouterRestTest {
 
     @Test
     void listenGetUserByIdReturnsNotFound() {
-        Mockito.when(handler.listenGetUserById(Mockito.any()))
+        Mockito.when(userHandler.listenGetUserById(Mockito.any()))
                 .thenReturn(Mono.just(ServerResponse.notFound().build().block()));
 
         webTestClient.get()
@@ -115,7 +115,7 @@ class RouterRestTest {
     @Test
     void listenDeleteUserByIdReturnsNoContent() {
         when(userUseCase.deleteUserById(BigInteger.ONE)).thenReturn(Mono.empty());
-        Mockito.when(handler.listenDeleteUserById(Mockito.any()))
+        Mockito.when(userHandler.listenDeleteUserById(Mockito.any()))
                 .thenReturn(Mono.just(ServerResponse.noContent().build().block()));
         webTestClient.delete()
                 .uri("/api/v1/users/1")
@@ -126,7 +126,7 @@ class RouterRestTest {
     @Test
     void listenGetAllUsersReturnsAllUsers() {
         when(userUseCase.findAllUsers()).thenReturn(Flux.just(testUser));
-        Mockito.when(handler.listenGetAllUsers(Mockito.any()))
+        Mockito.when(userHandler.listenGetAllUsers(Mockito.any()))
                 .thenReturn(Mono.just(ServerResponse.ok().build().block()));
 
         webTestClient.get()

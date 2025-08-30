@@ -25,7 +25,7 @@ import java.time.Instant;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class Handler {
+public class UserHandler {
 
     private final UserUseCase userUseCase;
     private final UserDTOMapper userDTOMapper;

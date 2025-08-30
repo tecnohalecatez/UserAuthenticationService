@@ -19,10 +19,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class UserRepositoryAdapterTest {
+class UserReactiveRepositoryAdapterTest {
 
     @InjectMocks
-    private UserRepositoryAdapter repositoryAdapter;
+    private UserReactiveRepositoryAdapter repositoryAdapter;
 
     @Mock
     private UserReactiveRepository repository;
