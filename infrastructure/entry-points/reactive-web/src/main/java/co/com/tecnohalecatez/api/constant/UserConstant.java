@@ -13,6 +13,4 @@ public class UserConstant {
     public static final String INVALID_USER_DATA = "Invalid User Data Supplied";
     public static final String INTERNAL_SERVER_ERROR = "Internal Server Error";
 
-
-
 }
