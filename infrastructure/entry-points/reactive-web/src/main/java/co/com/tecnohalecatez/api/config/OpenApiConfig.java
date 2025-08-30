@@ -17,7 +17,7 @@ public class OpenApiConfig {
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("User Registration Service API")
+                        .title("User Authentication Service API")
                         .description("REST API for user management with clean architecture")
                         .version("v1.0.0")
                         .contact(new Contact()
