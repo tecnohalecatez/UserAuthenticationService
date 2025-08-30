@@ -16,7 +16,6 @@ import org.springdoc.core.annotations.RouterOperation;
 import org.springdoc.core.annotations.RouterOperations;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.reactive.function.server.RouterFunction;
@@ -38,8 +37,9 @@ public class RouterRest {
                     beanMethod = UserConstant.LISTEN + UserConstant.SAVE_USER,
                     operation = @Operation(
                             operationId = UserConstant.SAVE_USER,
-                            summary = "Register a new user",
+                            summary = "🆕  Register a new user",
                             description = "Receives a CreateUserDTO object and saves a new user in the system.",
+                            tags = {"Users"},
                             requestBody = @RequestBody(
                                     required = true,
                                     description = "User creation data",
@@ -84,8 +84,9 @@ public class RouterRest {
                     beanMethod = UserConstant.LISTEN + UserConstant.GET_USER_ID,
                     operation = @Operation(
                             operationId = UserConstant.GET_USER_ID,
-                            summary = "Get user by ID",
+                            summary = "🔍 Get user by ID",
                             description = "Retrieve a user by their unique identifier.",
+                            tags = {"Users"},
                             parameters = {
                                     @Parameter(
                                             name = "id",
@@ -139,8 +140,9 @@ public class RouterRest {
                     beanMethod = UserConstant.LISTEN + UserConstant.UPDATE_USER,
                     operation = @Operation(
                             operationId = UserConstant.UPDATE_USER,
-                            summary = "Update user",
+                            summary = "✏️ Update user",
                             description = "Updates an existing user using the user data.",
+                            tags = {"Users"},
                             requestBody = @RequestBody(
                                     required = true,
                                     description = "User data to update",
@@ -193,8 +195,9 @@ public class RouterRest {
                     beanMethod = UserConstant.LISTEN + UserConstant.DELETE_USER_ID,
                     operation = @Operation(
                             operationId = UserConstant.DELETE_USER_ID,
-                            summary = "Delete user by ID",
+                            summary = "🗑️ Delete user by ID",
                             description = "Deletes a user identified by the given unique ID.",
+                            tags = {"Users"},
                             parameters = {
                                     @Parameter(
                                             name = "id",
@@ -245,8 +248,9 @@ public class RouterRest {
                     beanMethod = UserConstant.LISTEN + UserConstant.GET_ALL_USERS,
                     operation = @Operation(
                             operationId = UserConstant.GET_ALL_USERS,
-                            summary = "Get all users",
+                            summary = "📄 Get all users",
                             description = "Retrieve a list of all users from the system.",
+                            tags = {"Users"},
                             responses = {
                                     @ApiResponse(
                                             responseCode = "200",
