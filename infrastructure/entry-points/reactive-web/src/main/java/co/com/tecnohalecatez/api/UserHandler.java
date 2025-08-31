@@ -1,7 +1,7 @@
 package co.com.tecnohalecatez.api;
 
 import co.com.tecnohalecatez.api.constant.UserConstant;
-import co.com.tecnohalecatez.api.dto.ErrorReponseDTO;
+import co.com.tecnohalecatez.api.dto.ErrorResponseDTO;
 import co.com.tecnohalecatez.api.dto.UserDTO;
 import co.com.tecnohalecatez.api.dto.UserDataDTO;
 import co.com.tecnohalecatez.api.exception.UserDataException;
@@ -51,7 +51,7 @@ public class UserHandler {
                         .contentType(MediaType.APPLICATION_JSON)
                         .bodyValue(userDTOMapper.toResponse(savedUser)))
                 .onErrorResume(UserDataException.class, e -> {
-                    ErrorReponseDTO errorResponse = new ErrorReponseDTO(
+                    ErrorResponseDTO errorResponse = new ErrorResponseDTO(
                             Instant.now().toString(),
                             400,
                             "Bad Request",
@@ -89,7 +89,7 @@ public class UserHandler {
                 )
                 .switchIfEmpty(Mono.error(new UserNotFoundException("User not found")))
                 .onErrorResume(UserDataException.class, e -> {
-                    ErrorReponseDTO errorResponse = new ErrorReponseDTO(
+                    ErrorResponseDTO errorResponse = new ErrorResponseDTO(
                             Instant.now().toString(),
                             400,
                             "Bad Request",
@@ -100,7 +100,7 @@ public class UserHandler {
                             .bodyValue(errorResponse);
                 })
                 .onErrorResume(UserNotFoundException.class, e -> {
-                    ErrorReponseDTO errorResponse = new ErrorReponseDTO(
+                    ErrorResponseDTO errorResponse = new ErrorResponseDTO(
                             Instant.now().toString(),
                             404,
                             "Not Found",
