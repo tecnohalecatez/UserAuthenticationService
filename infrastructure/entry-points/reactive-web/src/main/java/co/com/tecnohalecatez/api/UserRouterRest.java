@@ -2,7 +2,7 @@ package co.com.tecnohalecatez.api;
 
 import co.com.tecnohalecatez.api.config.UserPath;
 import co.com.tecnohalecatez.api.constant.UserConstant;
-import co.com.tecnohalecatez.api.dto.ErrorReponseDTO;
+import co.com.tecnohalecatez.api.dto.ErrorResponseDTO;
 import co.com.tecnohalecatez.api.dto.UserDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -62,7 +62,7 @@ public class UserRouterRest {
                                             description = UserConstant.INVALID_USER_DATA,
                                             content = @Content(
                                                     mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                                    schema = @Schema(implementation = ErrorReponseDTO.class)
+                                                    schema = @Schema(implementation = ErrorResponseDTO.class)
                                             )
                                     ),
                                     @ApiResponse(
@@ -70,7 +70,7 @@ public class UserRouterRest {
                                             description = UserConstant.INTERNAL_SERVER_ERROR,
                                             content = @Content(
                                                     mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                                    schema = @Schema(implementation = ErrorReponseDTO.class)
+                                                    schema = @Schema(implementation = ErrorResponseDTO.class)
                                             )
                                     )
                             }
@@ -110,7 +110,7 @@ public class UserRouterRest {
                                             description = "Invalid ID supplied",
                                             content = @Content(
                                                     mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                                    schema = @Schema(implementation = ErrorReponseDTO.class)
+                                                    schema = @Schema(implementation = ErrorResponseDTO.class)
                                             )
                                     ),
                                     @ApiResponse(
@@ -118,7 +118,7 @@ public class UserRouterRest {
                                             description = "User not found",
                                             content = @Content(
                                                     mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                                    schema = @Schema(implementation = ErrorReponseDTO.class)
+                                                    schema = @Schema(implementation = ErrorResponseDTO.class)
                                             )
                                     ),
                                     @ApiResponse(
@@ -126,7 +126,7 @@ public class UserRouterRest {
                                             description = UserConstant.INTERNAL_SERVER_ERROR,
                                             content = @Content(
                                                     mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                                    schema = @Schema(implementation = ErrorReponseDTO.class)
+                                                    schema = @Schema(implementation = ErrorResponseDTO.class)
                                             )
                                     )
                             }
@@ -165,7 +165,7 @@ public class UserRouterRest {
                                             description = "Invalid user data supplied",
                                             content = @Content(
                                                     mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                                    schema = @Schema(implementation = ErrorReponseDTO.class)
+                                                    schema = @Schema(implementation = ErrorResponseDTO.class)
                                             )
                                     ),
                                     @ApiResponse(
@@ -173,7 +173,7 @@ public class UserRouterRest {
                                             description = "User not found",
                                             content = @Content(
                                                     mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                                    schema = @Schema(implementation = ErrorReponseDTO.class)
+                                                    schema = @Schema(implementation = ErrorResponseDTO.class)
                                             )
                                     ),
                                     @ApiResponse(
@@ -181,7 +181,7 @@ public class UserRouterRest {
                                             description = UserConstant.INTERNAL_SERVER_ERROR,
                                             content = @Content(
                                                     mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                                    schema = @Schema(implementation = ErrorReponseDTO.class)
+                                                    schema = @Schema(implementation = ErrorResponseDTO.class)
                                             )
                                     )
                             }
@@ -218,7 +218,7 @@ public class UserRouterRest {
                                             description = "Invalid ID supplied",
                                             content = @Content(
                                                     mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                                    schema = @Schema(implementation = ErrorReponseDTO.class)
+                                                    schema = @Schema(implementation = ErrorResponseDTO.class)
                                             )
                                     ),
                                     @ApiResponse(
@@ -226,7 +226,7 @@ public class UserRouterRest {
                                             description = "User not found",
                                             content = @Content(
                                                     mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                                    schema = @Schema(implementation = ErrorReponseDTO.class)
+                                                    schema = @Schema(implementation = ErrorResponseDTO.class)
                                             )
                                     ),
                                     @ApiResponse(
@@ -234,7 +234,7 @@ public class UserRouterRest {
                                             description = UserConstant.INTERNAL_SERVER_ERROR,
                                             content = @Content(
                                                     mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                                    schema = @Schema(implementation = ErrorReponseDTO.class)
+                                                    schema = @Schema(implementation = ErrorResponseDTO.class)
                                             )
                                     )
                             }
@@ -265,7 +265,7 @@ public class UserRouterRest {
                                             description = UserConstant.INTERNAL_SERVER_ERROR,
                                             content = @Content(
                                                     mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                                    schema = @Schema(implementation = ErrorReponseDTO.class)
+                                                    schema = @Schema(implementation = ErrorResponseDTO.class)
                                             )
                                     )
                             }
