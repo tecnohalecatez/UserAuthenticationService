@@ -34,7 +34,7 @@ public class UserHandler {
     public Mono<ServerResponse> listenSaveUser(ServerRequest serverRequest) {
         return serverRequest.bodyToMono(UserDataDTO.class)
                 .flatMap(userDataDTO -> {
-                    BeanPropertyBindingResult errors = new BeanPropertyBindingResult(userDataDTO, UserDTO.class.getName());
+                    BeanPropertyBindingResult errors = new BeanPropertyBindingResult(userDataDTO, UserDataDTO.class.getName());
                     validator.validate(userDataDTO, errors);
                     if (errors.hasErrors()) {
                         return Mono.error(new UserDataException(UserConstant.INVALID_USER_DATA));
@@ -75,7 +75,7 @@ public class UserHandler {
         return userUseCase.getUserById(new BigInteger(serverRequest.pathVariable("id")))
                 .flatMap(existingUser -> serverRequest.bodyToMono(UserDataDTO.class)
                         .flatMap(userDataDTO -> {
-                            BeanPropertyBindingResult errors = new BeanPropertyBindingResult(userDataDTO, UserDTO.class.getName());
+                            BeanPropertyBindingResult errors = new BeanPropertyBindingResult(userDataDTO, UserDataDTO.class.getName());
                             validator.validate(userDataDTO, errors);
                             if (errors.hasErrors()) {
                                 return Mono.error(new UserDataException(UserConstant.INVALID_USER_DATA));
