@@ -1,6 +1,8 @@
 package co.com.tecnohalecatez.config;
 
+import co.com.tecnohalecatez.model.user.gateways.UserRepository;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -33,6 +35,11 @@ class UseCasesConfigTest {
         @Bean
         public MyUseCase myUseCase() {
             return new MyUseCase();
+        }
+
+        @Bean
+        public UserRepository userRepository() {
+            return Mockito.mock(UserRepository.class);
         }
     }
 

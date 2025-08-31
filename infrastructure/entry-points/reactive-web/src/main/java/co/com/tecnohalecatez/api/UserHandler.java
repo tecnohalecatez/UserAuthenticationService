@@ -2,7 +2,6 @@ package co.com.tecnohalecatez.api;
 
 import co.com.tecnohalecatez.api.constant.UserConstant;
 import co.com.tecnohalecatez.api.dto.ErrorResponseDTO;
-import co.com.tecnohalecatez.api.dto.UserDTO;
 import co.com.tecnohalecatez.api.dto.UserDataDTO;
 import co.com.tecnohalecatez.api.exception.UserDataException;
 import co.com.tecnohalecatez.api.exception.UserNotFoundException;
@@ -60,6 +59,17 @@ public class UserHandler {
                     return ServerResponse.badRequest()
                             .contentType(MediaType.APPLICATION_JSON)
                             .bodyValue(errorResponse);
+                })
+                .onErrorResume(e -> {
+                    ErrorResponseDTO errorResponse = new ErrorResponseDTO(
+                            Instant.now().toString(),
+                            HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                            "Internal Server",
+                            e.getMessage()
+                    );
+                    return ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .bodyValue(errorResponse);
                 });
     }
 
@@ -68,7 +78,18 @@ public class UserHandler {
                 .flatMap(user -> ServerResponse.ok()
                         .contentType(MediaType.APPLICATION_JSON)
                         .bodyValue(userDTOMapper.toResponse(user)))
-                .switchIfEmpty(ServerResponse.notFound().build());
+                .switchIfEmpty(ServerResponse.notFound().build())
+                .onErrorResume(e -> {
+                    ErrorResponseDTO errorResponse = new ErrorResponseDTO(
+                            Instant.now().toString(),
+                            500,
+                            "Internal Server",
+                            e.getMessage()
+                    );
+                    return ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .bodyValue(errorResponse);
+                });
     }
 
     public Mono<ServerResponse> listenUpdateUser(ServerRequest serverRequest) {
@@ -109,18 +130,54 @@ public class UserHandler {
                     return ServerResponse.status(HttpStatus.NOT_FOUND)
                             .contentType(MediaType.APPLICATION_JSON)
                             .bodyValue(errorResponse);
+                })
+                .onErrorResume(e -> {
+                    ErrorResponseDTO errorResponse = new ErrorResponseDTO(
+                            Instant.now().toString(),
+                            500,
+                            "Internal Server",
+                            e.getMessage()
+                    );
+                    return ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .bodyValue(errorResponse);
                 });
     }
 
     public Mono<ServerResponse> listenDeleteUserById(ServerRequest serverRequest) {
         return userUseCase.deleteUserById(new BigInteger(serverRequest.pathVariable("id")))
-                .then(ServerResponse.noContent().build());
+                .then(ServerResponse.noContent().build())
+                .onErrorResume(e -> {
+                    ErrorResponseDTO errorResponse = new ErrorResponseDTO(
+                            Instant.now().toString(),
+                            500,
+                            "Internal Server",
+                            e.getMessage()
+                    );
+                    return ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .bodyValue(errorResponse);
+                });
     }
 
     public Mono<ServerResponse> listenGetAllUsers(ServerRequest serverRequest) {
-        return ServerResponse.ok()
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(userDTOMapper.toResponseFlux(userUseCase.findAllUsers()), UserDTO.class);
+        return userUseCase.findAllUsers()
+                .map(userDTOMapper::toResponse)
+                .collectList()
+                .flatMap(userList -> ServerResponse.ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .bodyValue(userList))
+                .onErrorResume(e -> {
+                    ErrorResponseDTO errorResponse = new ErrorResponseDTO(
+                            Instant.now().toString(),
+                            500,
+                            "Internal Server",
+                            e.getMessage()
+                    );
+                    return ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .bodyValue(errorResponse);
+                });
     }
 
 }
