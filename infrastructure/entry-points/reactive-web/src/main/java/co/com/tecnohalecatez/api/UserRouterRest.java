@@ -4,6 +4,7 @@ import co.com.tecnohalecatez.api.config.UserPath;
 import co.com.tecnohalecatez.api.constant.UserConstant;
 import co.com.tecnohalecatez.api.dto.ErrorResponseDTO;
 import co.com.tecnohalecatez.api.dto.UserDTO;
+import co.com.tecnohalecatez.api.dto.UserDataDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -38,14 +39,14 @@ public class UserRouterRest {
                     operation = @Operation(
                             operationId = UserConstant.SAVE_USER,
                             summary = "🆕  Register a new user",
-                            description = "Receives a CreateUserDTO object and saves a new user in the system.",
+                            description = "Receives a UserDataDTO object and saves a new user in the system.",
                             tags = {"Users"},
                             requestBody = @RequestBody(
                                     required = true,
                                     description = "User creation data",
                                     content = @Content(
                                             mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                            schema = @Schema(implementation = UserDTO.class)
+                                            schema = @Schema(implementation = UserDataDTO.class)
                                     )
                             ),
                             responses = {
@@ -148,7 +149,7 @@ public class UserRouterRest {
                                     description = "User data to update",
                                     content = @Content(
                                             mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                            schema = @Schema(implementation = UserDTO.class)
+                                            schema = @Schema(implementation = UserDataDTO.class)
                                     )
                             ),
                             responses = {
