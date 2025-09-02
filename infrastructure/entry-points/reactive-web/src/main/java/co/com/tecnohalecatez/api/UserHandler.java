@@ -1,7 +1,6 @@
 package co.com.tecnohalecatez.api;
 
 import co.com.tecnohalecatez.api.constant.UserConstant;
-import co.com.tecnohalecatez.api.dto.ErrorResponseDTO;
 import co.com.tecnohalecatez.api.dto.UserDataDTO;
 import co.com.tecnohalecatez.api.exception.UserDataException;
 import co.com.tecnohalecatez.api.exception.UserNotFoundException;
@@ -19,7 +18,6 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
 import java.math.BigInteger;
-import java.time.Instant;
 
 @Component
 @RequiredArgsConstructor
@@ -48,29 +46,7 @@ public class UserHandler {
                 })
                 .flatMap(savedUser -> ServerResponse.status(HttpStatus.CREATED)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .bodyValue(userDTOMapper.toResponse(savedUser)))
-                .onErrorResume(UserDataException.class, e -> {
-                    ErrorResponseDTO errorResponse = new ErrorResponseDTO(
-                            Instant.now().toString(),
-                            400,
-                            "Bad Request",
-                            e.getMessage()
-                    );
-                    return ServerResponse.badRequest()
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .bodyValue(errorResponse);
-                })
-                .onErrorResume(e -> {
-                    ErrorResponseDTO errorResponse = new ErrorResponseDTO(
-                            Instant.now().toString(),
-                            HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                            "Internal Server",
-                            e.getMessage()
-                    );
-                    return ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .bodyValue(errorResponse);
-                });
+                        .bodyValue(userDTOMapper.toResponse(savedUser)));
     }
 
     public Mono<ServerResponse> listenGetUserById(ServerRequest serverRequest) {
@@ -78,18 +54,7 @@ public class UserHandler {
                 .flatMap(user -> ServerResponse.ok()
                         .contentType(MediaType.APPLICATION_JSON)
                         .bodyValue(userDTOMapper.toResponse(user)))
-                .switchIfEmpty(ServerResponse.notFound().build())
-                .onErrorResume(e -> {
-                    ErrorResponseDTO errorResponse = new ErrorResponseDTO(
-                            Instant.now().toString(),
-                            500,
-                            "Internal Server",
-                            e.getMessage()
-                    );
-                    return ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .bodyValue(errorResponse);
-                });
+                .switchIfEmpty(Mono.error(new UserNotFoundException(UserConstant.USER_NOT_FOUND)));
     }
 
     public Mono<ServerResponse> listenUpdateUser(ServerRequest serverRequest) {
@@ -108,56 +73,14 @@ public class UserHandler {
                                 .bodyValue(userDTOMapper.toResponse(updatedUser))
                         )
                 )
-                .switchIfEmpty(Mono.error(new UserNotFoundException("User not found")))
-                .onErrorResume(UserDataException.class, e -> {
-                    ErrorResponseDTO errorResponse = new ErrorResponseDTO(
-                            Instant.now().toString(),
-                            400,
-                            "Bad Request",
-                            e.getMessage()
-                    );
-                    return ServerResponse.badRequest()
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .bodyValue(errorResponse);
-                })
-                .onErrorResume(UserNotFoundException.class, e -> {
-                    ErrorResponseDTO errorResponse = new ErrorResponseDTO(
-                            Instant.now().toString(),
-                            404,
-                            "Not Found",
-                            e.getMessage()
-                    );
-                    return ServerResponse.status(HttpStatus.NOT_FOUND)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .bodyValue(errorResponse);
-                })
-                .onErrorResume(e -> {
-                    ErrorResponseDTO errorResponse = new ErrorResponseDTO(
-                            Instant.now().toString(),
-                            500,
-                            "Internal Server",
-                            e.getMessage()
-                    );
-                    return ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .bodyValue(errorResponse);
-                });
+                .switchIfEmpty(Mono.error(new UserNotFoundException(UserConstant.USER_NOT_FOUND)));
     }
 
     public Mono<ServerResponse> listenDeleteUserById(ServerRequest serverRequest) {
-        return userUseCase.deleteUserById(new BigInteger(serverRequest.pathVariable("id")))
-                .then(ServerResponse.noContent().build())
-                .onErrorResume(e -> {
-                    ErrorResponseDTO errorResponse = new ErrorResponseDTO(
-                            Instant.now().toString(),
-                            500,
-                            "Internal Server",
-                            e.getMessage()
-                    );
-                    return ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .bodyValue(errorResponse);
-                });
+        return userUseCase.getUserById(new BigInteger(serverRequest.pathVariable("id")))
+                .flatMap(existingUser -> userUseCase.deleteUserById(new BigInteger(serverRequest.pathVariable("id")))
+                        .then(ServerResponse.noContent().build()))
+                .switchIfEmpty(Mono.error(new UserNotFoundException(UserConstant.USER_NOT_FOUND)));
     }
 
     public Mono<ServerResponse> listenGetAllUsers(ServerRequest serverRequest) {
@@ -167,17 +90,7 @@ public class UserHandler {
                 .flatMap(userList -> ServerResponse.ok()
                         .contentType(MediaType.APPLICATION_JSON)
                         .bodyValue(userList))
-                .onErrorResume(e -> {
-                    ErrorResponseDTO errorResponse = new ErrorResponseDTO(
-                            Instant.now().toString(),
-                            500,
-                            "Internal Server",
-                            e.getMessage()
-                    );
-                    return ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .bodyValue(errorResponse);
-                });
+                .switchIfEmpty(Mono.error(new UserNotFoundException(UserConstant.USER_NOT_FOUND)));
     }
 
 }
