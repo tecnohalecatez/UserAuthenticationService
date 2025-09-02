@@ -3,6 +3,7 @@ package co.com.tecnohalecatez.api;
 import co.com.tecnohalecatez.api.config.UserPath;
 import co.com.tecnohalecatez.api.dto.UserDTO;
 import co.com.tecnohalecatez.api.dto.UserDataDTO;
+import co.com.tecnohalecatez.api.exception.GlobalExceptionHandler;
 import co.com.tecnohalecatez.api.mapper.UserDTOMapper;
 import co.com.tecnohalecatez.model.user.User;
 import co.com.tecnohalecatez.usecase.user.UserUseCase;
@@ -28,7 +29,7 @@ import static org.mockito.Mockito.doNothing;
 
 import org.springframework.validation.Validator;
 
-@ContextConfiguration(classes = {UserRouterRest.class, UserHandler.class})
+@ContextConfiguration(classes = {UserRouterRest.class, UserHandler.class, GlobalExceptionHandler.class})
 @EnableConfigurationProperties(UserPath.class)
 @WebFluxTest
 class UserRouterRestTest {
@@ -123,17 +124,37 @@ class UserRouterRestTest {
     void listenGetUserByIdReturnsNotFound() {
         when(userUseCase.getUserById(BigInteger.valueOf(999))).thenReturn(Mono.empty());
         webTestClient.get()
-                .uri("/api/v1/users/999")
+                .uri(users + "/999")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isNotFound();
     }
 
     @Test
+    void listenUpdateUserReturnsUpdatedUser() {
+        UserDTO expectedUserDTO = new UserDTO(BigInteger.ONE, "John", "Doe", LocalDate.of(1990, 1, 1), "123 Main St", "555-1234", "john.doe@example.com", 50000.0);
+        doNothing().when(validator).validate(any(), any());
+        when(userUseCase.getUserById(BigInteger.ONE)).thenReturn(Mono.just(testUserOne));
+        when(userDTOMapper.toModel(testUserDataDTO)).thenReturn(testUserOne);
+        when(userUseCase.saveUser(any(User.class))).thenReturn(Mono.just(testUserOne));
+        when(userDTOMapper.toResponse(testUserOne)).thenReturn(expectedUserDTO);
+        webTestClient.put()
+                .uri(users + "/1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(testUserDataDTO)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(UserDTO.class)
+                .value(userDTO ->
+                        Assertions.assertThat(userDTO.id()).isEqualTo(BigInteger.ONE));
+    }
+
+    @Test
     void listenDeleteUserByIdReturnsNoContent() {
+        when(userUseCase.getUserById(BigInteger.ONE)).thenReturn(Mono.just(testUserOne));
         when(userUseCase.deleteUserById(BigInteger.ONE)).thenReturn(Mono.empty());
         webTestClient.delete()
-                .uri("/api/v1/users/1")
+                .uri(users + "/1")
                 .exchange()
                 .expectStatus().isNoContent();
     }
