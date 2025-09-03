@@ -21,13 +21,13 @@ management:
       probes:
         enabled: true
 cors:
-  allowed-origins: "http://localhost:4200,http://localhost:9090"
-
+  allowed-origins: "http://localhost:4200,http://localhost:8080"
 routes:
   paths:
     users: "/api/v1/users"
     usersById: "/api/v1/users/{id}"
-
+  path:
+    login: "/api/v1/login"
 adapters:
   r2dbc:
     host: "localhost"
@@ -36,8 +36,7 @@ adapters:
     schema: "service"
     username: "postgres"
     password: "postgres"
-
 logging:
   level:
-    root: INFO
-    co.com.tecnohalecatez: TRACE
+    root: "INFO"
+    co.com.tecnohalecatez: "TRACE"
