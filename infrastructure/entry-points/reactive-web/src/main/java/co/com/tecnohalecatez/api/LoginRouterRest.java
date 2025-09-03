@@ -11,7 +11,7 @@ import static org.springframework.web.reactive.function.server.RouterFunctions.r
 
 @Configuration
 public class LoginRouterRest {
-    @Bean
+    @Bean("loginRouterFunction")
     public RouterFunction<ServerResponse> routerFunction(LoginHandler loginHandler, LoginPath loginPath) {
         return route(POST(loginPath.getLogin()), loginHandler::listenGetToken);
     }

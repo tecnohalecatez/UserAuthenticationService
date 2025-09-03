@@ -26,7 +26,7 @@ INSERT INTO service.roles (name, description) VALUES
     ('SUPERVISOR', 'Supervisor'),
     ('ADVISER', 'Asesor');
 
-ALTER TABLE service.users ADD COLUMN rol_id INTEGER NOT NULL DEFAULT 1;
+ALTER TABLE service.users ADD COLUMN role_id INTEGER NOT NULL DEFAULT 1;
 ALTER TABLE service.users ADD COLUMN password VARCHAR(100) NOT NULL DEFAULT '123456';
 
-ALTER TABLE service.users ADD FOREIGN KEY (rol_id) REFERENCES service.roles(id);
+ALTER TABLE service.users ADD FOREIGN KEY (role_id) REFERENCES service.roles(id);
