@@ -26,7 +26,7 @@ routes:
   paths:
     users: "/api/v1/users"
     usersById: "/api/v1/users/{id}"
-  path:
+  login:
     login: "/api/v1/login"
 adapters:
   r2dbc:

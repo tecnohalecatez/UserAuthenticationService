@@ -6,7 +6,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @Getter
 @Setter
-@ConfigurationProperties(prefix = "routes.path")
+@ConfigurationProperties(prefix = "routes.login")
 public class LoginPath {
     private String login;
 }
