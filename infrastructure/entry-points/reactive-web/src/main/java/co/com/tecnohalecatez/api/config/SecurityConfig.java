@@ -18,15 +18,20 @@ public class SecurityConfig {
     public SecurityWebFilterChain securityWebFilterChain(
             ServerHttpSecurity http, ReactiveJwtDecoder jwtDecoder,
             Converter<Jwt, Mono<AbstractAuthenticationToken>> jwtAuthenticationConverter,
-            CustomAuthenticationEntryPoint entryPoint) {
+            CustomAuthenticationEntryPoint entryPoint,
+            CustomAccessDeniedHandler accessDeniedHandler,
+            UserPath userPath,
+            LoginPath loginPath) {
         http.csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .authorizeExchange(exchanges -> exchanges
-                        .pathMatchers("/api/v1/login", "/swagger-ui/**", "/v3/api-docs/**", "/actuator/**").permitAll()
-                        .pathMatchers(HttpMethod.POST, "/api/v1/users").hasRole("1")
+                        .pathMatchers(loginPath.getLogin(), "/swagger-ui/**", "/v3/api-docs/**", "/actuator/**").permitAll()
+                        .pathMatchers(HttpMethod.POST, userPath.getUsers()).hasRole("2")
+                        .pathMatchers(HttpMethod.GET, userPath.getUsers()).hasRole("1")
                         .anyExchange().authenticated()
                 )
                 .exceptionHandling(exceptionHandling -> exceptionHandling
                         .authenticationEntryPoint(entryPoint)
+                        .accessDeniedHandler(accessDeniedHandler)
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(jwt -> jwt
