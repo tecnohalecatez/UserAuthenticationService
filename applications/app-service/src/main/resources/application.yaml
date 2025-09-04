@@ -11,6 +11,11 @@ spring:
       path: "/h2"
   profiles:
     include: null
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          secret-key: "3cfa76ef14937c1c0ea519f8fc057a80fcd04a7420f8e8bcd0a7567c272e007b"
 management:
   endpoints:
     web:
@@ -21,13 +26,13 @@ management:
       probes:
         enabled: true
 cors:
-  allowed-origins: "http://localhost:4200,http://localhost:9090"
-
+  allowed-origins: "http://localhost:4200,http://localhost:8080"
 routes:
   paths:
     users: "/api/v1/users"
     usersById: "/api/v1/users/{id}"
-
+  login:
+    login: "/api/v1/login"
 adapters:
   r2dbc:
     host: "localhost"
@@ -36,8 +41,9 @@ adapters:
     schema: "service"
     username: "postgres"
     password: "postgres"
-
 logging:
   level:
-    root: INFO
-    co.com.tecnohalecatez: TRACE
+    root: "INFO"
+    co.com.tecnohalecatez: "TRACE"
+    org.springframework.security: "DEBUG"
+    org.springframework.security.oauth2: "DEBUG"
