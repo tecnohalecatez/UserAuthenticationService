@@ -14,13 +14,18 @@ import reactor.core.publisher.Mono;
 public class SecurityConfig {
 
     @Bean
-    public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http, ReactiveJwtDecoder jwtDecoder,
-        Converter<Jwt, Mono<AbstractAuthenticationToken>> jwtAuthenticationConverter) {
+    public SecurityWebFilterChain securityWebFilterChain(
+            ServerHttpSecurity http, ReactiveJwtDecoder jwtDecoder,
+            Converter<Jwt, Mono<AbstractAuthenticationToken>> jwtAuthenticationConverter,
+            CustomAuthenticationEntryPoint entryPoint) {
         http.csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .authorizeExchange(exchanges -> exchanges
-                        .pathMatchers("/api/v1/login")
+                        .pathMatchers("/api/v1/login", "/swagger-ui/**", "/v3/api-docs/**", "/actuator/**")
                         .permitAll()
                         .anyExchange().authenticated()
+                )
+                .exceptionHandling(exceptionHandling -> exceptionHandling
+                        .authenticationEntryPoint(entryPoint)
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(jwt -> jwt
@@ -29,4 +34,5 @@ public class SecurityConfig {
                 );
         return http.build();
     }
+
 }
