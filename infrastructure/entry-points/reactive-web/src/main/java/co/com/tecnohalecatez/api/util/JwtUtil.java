@@ -3,7 +3,7 @@ package co.com.tecnohalecatez.api.util;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 
-import java.security.Key;
+import javax.crypto.SecretKey;
 import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
@@ -11,10 +11,13 @@ import java.util.Map;
 
 public class JwtUtil {
 
-    private static final Key SECRET_KEY = Keys.hmacShaKeyFor(Base64.getDecoder()
-            .decode("3cfa76ef14937c1c0ea519f8fc057a80fcd04a7420f8e8bcd0a7567c272e007b"));
+    private static final SecretKey SECRET_KEY = Keys.hmacShaKeyFor(Base64.getDecoder()
+            .decode("UHJ1ZWJhQXBpQXV0ZW50aWNhY2lvblRlY25vaGFsZWNhdGV6"));
 
     private static final long EXPIRATION_TIME = 3600000;
+
+    private JwtUtil() {
+    }
 
     public static String generateToken(String email, String role) {
         Map<String, Object> claims = new HashMap<>();
