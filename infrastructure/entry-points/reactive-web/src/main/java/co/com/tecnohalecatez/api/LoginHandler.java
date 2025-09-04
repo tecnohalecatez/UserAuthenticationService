@@ -15,6 +15,7 @@ import org.springframework.validation.Validator;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 @Component
 @RequiredArgsConstructor
@@ -37,12 +38,14 @@ public class LoginHandler {
                                     return Mono.error(new UserDataException(UserConstant.INVALID_USER_DATA));
                                 }
                                 return userUseCase.findByEmailAndPassword(loginDataDTO.email(), loginDataDTO.password())
-                                        .flatMap(user -> {
-                                            String token = JwtUtil.generateToken(user.getEmail(), String.valueOf(user.getRoleId()));
-                                            return ServerResponse.status(HttpStatus.OK)
-                                                    .contentType(MediaType.APPLICATION_JSON)
-                                                    .bodyValue(new LoginDTO(token));
-                                        });
+                                        .flatMap(user -> Mono.fromCallable(() ->
+                                                        JwtUtil.generateToken(user.getEmail(), String.valueOf(user.getRoleId())))
+                                                .subscribeOn(Schedulers.boundedElastic())
+                                                .flatMap(token -> ServerResponse.status(HttpStatus.OK)
+                                                        .contentType(MediaType.APPLICATION_JSON)
+                                                        .bodyValue(new LoginDTO(token))
+                                                )
+                                        );
                             });
                 });
     }

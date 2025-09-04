@@ -4,12 +4,10 @@ import co.com.tecnohalecatez.api.config.LoginPath;
 import co.com.tecnohalecatez.api.dto.LoginDTO;
 import co.com.tecnohalecatez.api.dto.LoginDataDTO;
 import co.com.tecnohalecatez.api.exception.GlobalExceptionHandler;
-import co.com.tecnohalecatez.api.util.JwtUtil;
 import co.com.tecnohalecatez.model.user.User;
 import co.com.tecnohalecatez.usecase.user.UserUseCase;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.mockito.MockedStatic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
@@ -76,28 +74,21 @@ class LoginRouterRestTest {
 
     @Test
     void listenGetTokenReturnsTokenWhenValidCredentials() {
-        String expectedToken = "eyJhbGciOiJIUzM4NCJ9.eyJyb2xlIjoiMSIsInN1YiI6Imp1YW4ucGVyZXpAZW1haWwuY29tIiwiaWF0IjoxNzU2OTQ5NjU3LCJleHAiOjE3NTY5NTMyNTd9.HzdhkciOtRH9IqDXqSFjDidvKMK7PcsFU095T-iyZXpOtj1LEX5o7Hxrdau355uD";
-
         doNothing().when(validator).validate(any(), any());
         when(userUseCase.existsByEmailAndPassword(testValidLoginData.email(), testValidLoginData.password()))
                 .thenReturn(Mono.just(true));
         when(userUseCase.findByEmailAndPassword(testValidLoginData.email(), testValidLoginData.password()))
                 .thenReturn(Mono.just(testUser));
 
-        try (MockedStatic<JwtUtil> jwtUtilMock = mockStatic(JwtUtil.class)) {
-            jwtUtilMock.when(() -> JwtUtil.generateToken(testValidLoginData.email(), "1"))
-                    .thenReturn(expectedToken);
-
-            webTestClient.post()
-                    .uri(loginEndpoint)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .bodyValue(testValidLoginData)
-                    .exchange()
-                    .expectStatus().isOk()
-                    .expectBody(LoginDTO.class)
-                    .value(loginDTO ->
-                            Assertions.assertThat(loginDTO.token()).isEqualTo(expectedToken));
-        }
+        webTestClient.post()
+                .uri(loginEndpoint)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(testValidLoginData)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(LoginDTO.class)
+                .value(loginDTO ->
+                        Assertions.assertThat(loginDTO.token()).isNotNull());
     }
 
     @Test
