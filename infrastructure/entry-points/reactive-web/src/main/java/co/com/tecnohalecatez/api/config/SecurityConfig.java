@@ -3,6 +3,7 @@ package co.com.tecnohalecatez.api.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -20,8 +21,8 @@ public class SecurityConfig {
             CustomAuthenticationEntryPoint entryPoint) {
         http.csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .authorizeExchange(exchanges -> exchanges
-                        .pathMatchers("/api/v1/login", "/swagger-ui/**", "/v3/api-docs/**", "/actuator/**")
-                        .permitAll()
+                        .pathMatchers("/api/v1/login", "/swagger-ui/**", "/v3/api-docs/**", "/actuator/**").permitAll()
+                        .pathMatchers(HttpMethod.POST, "/api/v1/users").hasRole("ROLE_1")
                         .anyExchange().authenticated()
                 )
                 .exceptionHandling(exceptionHandling -> exceptionHandling

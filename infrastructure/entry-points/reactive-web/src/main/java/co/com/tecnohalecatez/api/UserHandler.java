@@ -29,7 +29,7 @@ public class UserHandler {
     private final UserDTOMapper userDTOMapper;
     private final Validator validator;
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ROLE_1')")
     public Mono<ServerResponse> listenSaveUser(ServerRequest serverRequest) {
         return serverRequest.bodyToMono(UserDataDTO.class)
                 .flatMap(userDataDTO -> {

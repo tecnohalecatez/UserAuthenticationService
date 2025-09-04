@@ -17,7 +17,7 @@ public class JwtConverterConfig {
     public Converter<Jwt, Mono<AbstractAuthenticationToken>> jwtAuthenticationConverter() {
         JwtGrantedAuthoritiesConverter converter = new JwtGrantedAuthoritiesConverter();
         converter.setAuthorityPrefix("ROLE_");
-        converter.setAuthoritiesClaimName("roles");
+        converter.setAuthoritiesClaimName("role");
 
         ReactiveJwtAuthenticationConverter reactiveConverter = new ReactiveJwtAuthenticationConverter();
         reactiveConverter.setJwtGrantedAuthoritiesConverter(jwt ->
