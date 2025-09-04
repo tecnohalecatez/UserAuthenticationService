@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.Validator;
@@ -29,7 +28,6 @@ public class UserHandler {
     private final UserDTOMapper userDTOMapper;
     private final Validator validator;
 
-    @PreAuthorize("hasRole('ROLE_1')")
     public Mono<ServerResponse> listenSaveUser(ServerRequest serverRequest) {
         return serverRequest.bodyToMono(UserDataDTO.class)
                 .flatMap(userDataDTO -> {

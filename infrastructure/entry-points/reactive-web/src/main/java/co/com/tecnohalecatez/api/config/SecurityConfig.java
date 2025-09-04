@@ -22,7 +22,7 @@ public class SecurityConfig {
         http.csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .authorizeExchange(exchanges -> exchanges
                         .pathMatchers("/api/v1/login", "/swagger-ui/**", "/v3/api-docs/**", "/actuator/**").permitAll()
-                        .pathMatchers(HttpMethod.POST, "/api/v1/users").hasRole("ROLE_1")
+                        .pathMatchers(HttpMethod.POST, "/api/v1/users").hasRole("1")
                         .anyExchange().authenticated()
                 )
                 .exceptionHandling(exceptionHandling -> exceptionHandling

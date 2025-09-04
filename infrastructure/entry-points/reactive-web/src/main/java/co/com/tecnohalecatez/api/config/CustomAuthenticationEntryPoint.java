@@ -3,6 +3,7 @@ package co.com.tecnohalecatez.api.config;
 import co.com.tecnohalecatez.api.dto.ErrorResponseDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -15,11 +16,15 @@ import reactor.core.publisher.Mono;
 import java.time.Instant;
 
 @Component
+@Slf4j
 public class CustomAuthenticationEntryPoint implements ServerAuthenticationEntryPoint {
 
     @SneakyThrows
     @Override
     public Mono<Void> commence(ServerWebExchange exchange, AuthenticationException ex) {
+        log.error("Authentication failed for path: {} - Error: {}", 
+                exchange.getRequest().getPath(), ex.getMessage());
+        
         ErrorResponseDTO errorResponse = new ErrorResponseDTO(
                 Instant.now().toString(),
                 401,
