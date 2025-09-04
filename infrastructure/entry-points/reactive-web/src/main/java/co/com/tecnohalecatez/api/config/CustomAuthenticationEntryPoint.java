@@ -16,19 +16,15 @@ import reactor.core.publisher.Mono;
 import java.time.Instant;
 
 @Component
-@Slf4j
 public class CustomAuthenticationEntryPoint implements ServerAuthenticationEntryPoint {
 
     @SneakyThrows
     @Override
     public Mono<Void> commence(ServerWebExchange exchange, AuthenticationException ex) {
-        log.error("Authentication failed for path: {} - Error: {}", 
-                exchange.getRequest().getPath(), ex.getMessage());
-        
         ErrorResponseDTO errorResponse = new ErrorResponseDTO(
                 Instant.now().toString(),
-                401,
-                "Unauthorized",
+                HttpStatus.UNAUTHORIZED.value(),
+                HttpStatus.UNAUTHORIZED.getReasonPhrase(),
                 ex.getMessage()
         );
         exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
