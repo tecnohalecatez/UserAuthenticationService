@@ -13,6 +13,7 @@ public class JwtUtil {
 
     private static final Key SECRET_KEY = Keys.hmacShaKeyFor(Base64.getDecoder()
             .decode("3cfa76ef14937c1c0ea519f8fc057a80fcd04a7420f8e8bcd0a7567c272e007b"));
+
     private static final long EXPIRATION_TIME = 3600000;
 
     public static String generateToken(String email, String role) {
