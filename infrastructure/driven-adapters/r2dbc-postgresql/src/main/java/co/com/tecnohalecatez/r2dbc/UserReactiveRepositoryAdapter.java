@@ -61,20 +61,12 @@ public class UserReactiveRepositoryAdapter extends ReactiveAdapterOperations<Use
     }
 
     @Override
-    public Mono<Boolean> existsByEmailAndPassword(String email, String password) {
-        log.trace("Start checking existence of user by email = {} and password", email);
-        return repository.existsByEmailAndPassword(email, password)
-                .doOnSuccess(exists -> log.trace("Existence check for email = {} and password -> {}", email, exists))
-                .doOnError(e -> log.error("Error checking existence of email = {} and password -> {}", email, e.getMessage(), e));
-    }
-
-    @Override
-    public Mono<User> findByEmailAndPassword(String email, String password) {
-        log.trace("Start find user by email = {} and password", email);
-        return repository.findByEmailAndPassword(email, password)
+    public Mono<User> findByEmail(String email) {
+        log.trace("Start find user by email = {} ", email);
+        return repository.findByEmail(email)
                 .map(this::toEntity)
-                .doOnSuccess(user -> log.trace("User found by email = {} and password -> {}", email, user.toString()))
-                .doOnError(e -> log.error("Error finding user by email = {} and password -> {}", email, e.getMessage(), e));
+                .doOnSuccess(user -> log.trace("User found by email = {} -> {}", email, user.toString()))
+                .doOnError(e -> log.error("Error finding user by email = {} -> {}", email, e.getMessage(), e));
     }
 
 }

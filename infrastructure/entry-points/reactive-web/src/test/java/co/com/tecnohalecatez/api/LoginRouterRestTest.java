@@ -5,6 +5,7 @@ import co.com.tecnohalecatez.api.dto.LoginDTO;
 import co.com.tecnohalecatez.api.dto.LoginDataDTO;
 import co.com.tecnohalecatez.api.exception.GlobalExceptionHandler;
 import co.com.tecnohalecatez.model.user.User;
+import co.com.tecnohalecatez.usecase.role.RoleUseCase;
 import co.com.tecnohalecatez.usecase.user.UserUseCase;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -38,6 +39,9 @@ class LoginRouterRestTest {
 
     @MockitoBean
     private UserUseCase userUseCase;
+
+    @MockitoBean
+    private RoleUseCase roleUseCase;
 
     @MockitoBean
     private Validator validator;
@@ -75,10 +79,8 @@ class LoginRouterRestTest {
     @Test
     void listenGetTokenReturnsTokenWhenValidCredentials() {
         doNothing().when(validator).validate(any(), any());
-        when(userUseCase.existsByEmailAndPassword(testValidLoginData.email(), testValidLoginData.password()))
-                .thenReturn(Mono.just(true));
-        when(userUseCase.findByEmailAndPassword(testValidLoginData.email(), testValidLoginData.password()))
-                .thenReturn(Mono.just(testUser));
+        when(userUseCase.existsByEmail(testValidLoginData.email())).thenReturn(Mono.just(true));
+        when(userUseCase.getUserByEmail(testValidLoginData.email())).thenReturn(Mono.just(testUser));
 
         webTestClient.post()
                 .uri(loginEndpoint)
@@ -94,8 +96,7 @@ class LoginRouterRestTest {
     @Test
     void listenGetTokenReturnsErrorWhenInvalidCredentials() {
         doNothing().when(validator).validate(any(), any());
-        when(userUseCase.existsByEmailAndPassword(testInvalidLoginData.email(), testInvalidLoginData.password()))
-                .thenReturn(Mono.just(false));
+        when(userUseCase.existsByEmail(testInvalidLoginData.email())).thenReturn(Mono.just(false));
 
         webTestClient.post()
                 .uri(loginEndpoint)

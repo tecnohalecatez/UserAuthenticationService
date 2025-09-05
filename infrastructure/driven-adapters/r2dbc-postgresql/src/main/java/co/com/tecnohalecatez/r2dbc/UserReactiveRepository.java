@@ -12,7 +12,5 @@ public interface UserReactiveRepository
 
     Mono<Boolean> existsByEmail(String email);
 
-    Mono<Boolean> existsByEmailAndPassword(String email, String password);
-
-    Mono<UserEntity> findByEmailAndPassword(String email, String password);
+    Mono<UserEntity> findByEmail(String email);
 }
