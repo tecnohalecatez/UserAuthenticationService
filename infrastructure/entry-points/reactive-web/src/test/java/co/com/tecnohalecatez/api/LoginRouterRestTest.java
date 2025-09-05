@@ -4,12 +4,14 @@ import co.com.tecnohalecatez.api.config.LoginPath;
 import co.com.tecnohalecatez.api.dto.LoginDTO;
 import co.com.tecnohalecatez.api.dto.LoginDataDTO;
 import co.com.tecnohalecatez.api.exception.GlobalExceptionHandler;
+import co.com.tecnohalecatez.model.role.Role;
 import co.com.tecnohalecatez.model.user.User;
 import co.com.tecnohalecatez.usecase.role.RoleUseCase;
 import co.com.tecnohalecatez.usecase.user.UserUseCase;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.reactive.ReactiveSecurityAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.http.MediaType;
@@ -28,7 +30,7 @@ import static org.mockito.Mockito.*;
 
 @ContextConfiguration(classes = {LoginRouterRest.class, LoginHandler.class, GlobalExceptionHandler.class})
 @EnableConfigurationProperties(LoginPath.class)
-@WebFluxTest
+@WebFluxTest(excludeAutoConfiguration = ReactiveSecurityAutoConfiguration.class)
 class LoginRouterRestTest {
 
     @Autowired
@@ -54,9 +56,15 @@ class LoginRouterRestTest {
             .address("123 Main St")
             .phone("555-1234")
             .email("john.doe@example.com")
-            .password("password123")
+            .password("$2a$10$N9qo8uLOickgx2ZMRZoMye1J8QQ67WL4s4K9mxeJzQlrKolF.7daa") // BCrypt hash of "password123"
             .roleId(1)
             .baseSalary(50000.0)
+            .build();
+
+    private final Role testRole = Role.builder()
+            .id(1)
+            .name("ADMIN")
+            .description("Administrator role")
             .build();
 
     private final LoginDataDTO testValidLoginData = new LoginDataDTO(
@@ -81,6 +89,7 @@ class LoginRouterRestTest {
         doNothing().when(validator).validate(any(), any());
         when(userUseCase.existsByEmail(testValidLoginData.email())).thenReturn(Mono.just(true));
         when(userUseCase.getUserByEmail(testValidLoginData.email())).thenReturn(Mono.just(testUser));
+        when(roleUseCase.getRoleById(1)).thenReturn(Mono.just(testRole));
 
         webTestClient.post()
                 .uri(loginEndpoint)
@@ -97,6 +106,8 @@ class LoginRouterRestTest {
     void listenGetTokenReturnsErrorWhenInvalidCredentials() {
         doNothing().when(validator).validate(any(), any());
         when(userUseCase.existsByEmail(testInvalidLoginData.email())).thenReturn(Mono.just(false));
+        when(userUseCase.getUserByEmail(testValidLoginData.email())).thenReturn(Mono.just(testUser));
+        when(roleUseCase.getRoleById(1)).thenReturn(Mono.just(testRole));
 
         webTestClient.post()
                 .uri(loginEndpoint)
