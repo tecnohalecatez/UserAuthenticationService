@@ -28,7 +28,7 @@ import static org.springframework.web.reactive.function.server.RouterFunctions.r
 @Configuration
 public class UserRouterRest {
 
-    @Bean
+    @Bean("userRouterFunction")
     @RouterOperations({
             @RouterOperation(
                     path = UserConstant.BASE_PATH,

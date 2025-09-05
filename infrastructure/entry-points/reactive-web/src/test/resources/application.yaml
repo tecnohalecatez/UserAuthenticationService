@@ -2,3 +2,5 @@ routes:
   paths:
     users: "/api/v1/users"
     usersById: "/api/v1/users/{id}"
+  login:
+    login: "/api/v1/login"

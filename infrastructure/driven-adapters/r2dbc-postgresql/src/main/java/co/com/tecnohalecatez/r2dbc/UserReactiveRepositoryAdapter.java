@@ -60,4 +60,13 @@ public class UserReactiveRepositoryAdapter extends ReactiveAdapterOperations<Use
                 .doOnError(e -> log.error("Error checking existence of email = {} -> {}", email, e.getMessage(), e));
     }
 
+    @Override
+    public Mono<User> findByEmail(String email) {
+        log.trace("Start find user by email = {} ", email);
+        return repository.findByEmail(email)
+                .map(this::toEntity)
+                .doOnSuccess(user -> log.trace("User found by email = {} -> {}", email, user.toString()))
+                .doOnError(e -> log.error("Error finding user by email = {} -> {}", email, e.getMessage(), e));
+    }
+
 }
