@@ -33,11 +33,8 @@ public class UserUseCase {
         return userRepository.existsByEmail(email);
     }
 
-    public Mono<Boolean> existsByEmailAndPassword(String email, String password) {
-        return userRepository.existsByEmailAndPassword(email, password);
+    public Mono<User> getUserByEmail(String email) {
+        return userRepository.findByEmail(email);
     }
 
-    public Mono<User> findByEmailAndPassword(String email, String password) {
-        return userRepository.findByEmailAndPassword(email, password);
-    }
 }
