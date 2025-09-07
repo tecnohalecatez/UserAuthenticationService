@@ -26,7 +26,6 @@ public class SecurityConfig {
                 .authorizeExchange(exchanges -> exchanges
                         .pathMatchers(loginPath.getLogin(), "/swagger-ui/**", "/v3/api-docs/**", "/actuator/**").permitAll()
                         .pathMatchers(HttpMethod.POST, userPath.getUsers()).hasAnyRole("ADMIN", "ADVISER")
-                        .pathMatchers(HttpMethod.GET, userPath.getUsers()).hasRole("1")
                         .anyExchange().authenticated()
                 )
                 .exceptionHandling(exceptionHandling -> exceptionHandling

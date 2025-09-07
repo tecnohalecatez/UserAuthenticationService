@@ -3,7 +3,6 @@ package co.com.tecnohalecatez.api.config;
 import co.com.tecnohalecatez.api.dto.ErrorResponseDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
