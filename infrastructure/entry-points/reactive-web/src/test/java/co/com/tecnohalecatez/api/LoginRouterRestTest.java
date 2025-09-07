@@ -4,12 +4,14 @@ import co.com.tecnohalecatez.api.config.LoginPath;
 import co.com.tecnohalecatez.api.dto.LoginDTO;
 import co.com.tecnohalecatez.api.dto.LoginDataDTO;
 import co.com.tecnohalecatez.api.exception.GlobalExceptionHandler;
+import co.com.tecnohalecatez.model.role.Role;
 import co.com.tecnohalecatez.model.user.User;
 import co.com.tecnohalecatez.usecase.role.RoleUseCase;
 import co.com.tecnohalecatez.usecase.user.UserUseCase;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.reactive.ReactiveSecurityAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.http.MediaType;
@@ -26,9 +28,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+import org.mockito.MockedStatic;
+import co.com.tecnohalecatez.api.util.JwtUtil;
+
 @ContextConfiguration(classes = {LoginRouterRest.class, LoginHandler.class, GlobalExceptionHandler.class})
 @EnableConfigurationProperties(LoginPath.class)
-@WebFluxTest
+@WebFluxTest(excludeAutoConfiguration = ReactiveSecurityAutoConfiguration.class)
 class LoginRouterRestTest {
 
     @Autowired
@@ -54,14 +59,20 @@ class LoginRouterRestTest {
             .address("123 Main St")
             .phone("555-1234")
             .email("john.doe@example.com")
-            .password("password123")
+            .password("$2a$10$QhTpcSLq3.JGCEBirC/k2uUIVHG97yY1DuJdVKbT2NN2/.EjrB89q")
             .roleId(1)
             .baseSalary(50000.0)
             .build();
 
+    private final Role testRole = Role.builder()
+            .id(1)
+            .name("ADMIN")
+            .description("Administrator role")
+            .build();
+
     private final LoginDataDTO testValidLoginData = new LoginDataDTO(
             "john.doe@example.com",
-            "password123"
+            "password"
     );
 
     private final LoginDataDTO testInvalidLoginData = new LoginDataDTO(
@@ -78,25 +89,34 @@ class LoginRouterRestTest {
 
     @Test
     void listenGetTokenReturnsTokenWhenValidCredentials() {
+        String expectedToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqb2huLmRvZUBleGFtcGxlLmNvbSIsInJvbGUiOiJBRE1JTiJ9.test-signature";
+
         doNothing().when(validator).validate(any(), any());
         when(userUseCase.existsByEmail(testValidLoginData.email())).thenReturn(Mono.just(true));
         when(userUseCase.getUserByEmail(testValidLoginData.email())).thenReturn(Mono.just(testUser));
+        when(roleUseCase.getRoleById(1)).thenReturn(Mono.just(testRole));
 
-        webTestClient.post()
-                .uri(loginEndpoint)
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(testValidLoginData)
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody(LoginDTO.class)
-                .value(loginDTO ->
-                        Assertions.assertThat(loginDTO.token()).isNotNull());
+        try (MockedStatic<JwtUtil> jwtUtilMock = mockStatic(JwtUtil.class)) {
+            jwtUtilMock.when(() -> JwtUtil.generateToken(testUser.getEmail(), testRole.getName()))
+                    .thenReturn(expectedToken);
+
+            webTestClient.post()
+                    .uri(loginEndpoint)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(testValidLoginData)
+                    .exchange()
+                    .expectStatus().isOk()
+                    .expectBody(LoginDTO.class)
+                    .value(loginDTO -> Assertions.assertThat(loginDTO.token()).contains("."));
+        }
     }
 
     @Test
     void listenGetTokenReturnsErrorWhenInvalidCredentials() {
         doNothing().when(validator).validate(any(), any());
         when(userUseCase.existsByEmail(testInvalidLoginData.email())).thenReturn(Mono.just(false));
+        when(userUseCase.getUserByEmail(testValidLoginData.email())).thenReturn(Mono.just(testUser));
+        when(roleUseCase.getRoleById(1)).thenReturn(Mono.just(testRole));
 
         webTestClient.post()
                 .uri(loginEndpoint)
