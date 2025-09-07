@@ -56,7 +56,7 @@ class LoginRouterRestTest {
             .address("123 Main St")
             .phone("555-1234")
             .email("john.doe@example.com")
-            .password("$2a$10$N9qo8uLOickgx2ZMRZoMye1J8QQ67WL4s4K9mxeJzQlrKolF.7daa") // BCrypt hash of "password123"
+            .password("$2a$10$QhTpcSLq3.JGCEBirC/k2uUIVHG97yY1DuJdVKbT2NN2/.EjrB89q")
             .roleId(1)
             .baseSalary(50000.0)
             .build();
@@ -69,7 +69,7 @@ class LoginRouterRestTest {
 
     private final LoginDataDTO testValidLoginData = new LoginDataDTO(
             "john.doe@example.com",
-            "password123"
+            "password"
     );
 
     private final LoginDataDTO testInvalidLoginData = new LoginDataDTO(
@@ -98,8 +98,11 @@ class LoginRouterRestTest {
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(LoginDTO.class)
-                .value(loginDTO ->
-                        Assertions.assertThat(loginDTO.token()).isNotNull());
+                .value(loginDTO -> {
+                    Assertions.assertThat(loginDTO.token()).isNotNull();
+                    Assertions.assertThat(loginDTO.token()).isNotEmpty();
+                    Assertions.assertThat(loginDTO.token()).contains(".");
+                });
     }
 
     @Test
