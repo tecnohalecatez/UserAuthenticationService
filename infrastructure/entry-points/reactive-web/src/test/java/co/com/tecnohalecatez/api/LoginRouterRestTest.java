@@ -28,6 +28,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+import org.mockito.MockedStatic;
+import co.com.tecnohalecatez.api.util.JwtUtil;
+
 @ContextConfiguration(classes = {LoginRouterRest.class, LoginHandler.class, GlobalExceptionHandler.class})
 @EnableConfigurationProperties(LoginPath.class)
 @WebFluxTest(excludeAutoConfiguration = ReactiveSecurityAutoConfiguration.class)
@@ -86,23 +89,26 @@ class LoginRouterRestTest {
 
     @Test
     void listenGetTokenReturnsTokenWhenValidCredentials() {
+        String expectedToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqb2huLmRvZUBleGFtcGxlLmNvbSIsInJvbGUiOiJBRE1JTiJ9.test-signature";
+
         doNothing().when(validator).validate(any(), any());
         when(userUseCase.existsByEmail(testValidLoginData.email())).thenReturn(Mono.just(true));
         when(userUseCase.getUserByEmail(testValidLoginData.email())).thenReturn(Mono.just(testUser));
         when(roleUseCase.getRoleById(1)).thenReturn(Mono.just(testRole));
 
-        webTestClient.post()
-                .uri(loginEndpoint)
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(testValidLoginData)
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody(LoginDTO.class)
-                .value(loginDTO -> {
-                    Assertions.assertThat(loginDTO.token()).isNotNull();
-                    Assertions.assertThat(loginDTO.token()).isNotEmpty();
-                    Assertions.assertThat(loginDTO.token()).contains(".");
-                });
+        try (MockedStatic<JwtUtil> jwtUtilMock = mockStatic(JwtUtil.class)) {
+            jwtUtilMock.when(() -> JwtUtil.generateToken(testUser.getEmail(), testRole.getName()))
+                    .thenReturn(expectedToken);
+
+            webTestClient.post()
+                    .uri(loginEndpoint)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(testValidLoginData)
+                    .exchange()
+                    .expectStatus().isOk()
+                    .expectBody(LoginDTO.class)
+                    .value(loginDTO -> Assertions.assertThat(loginDTO.token()).contains("."));
+        }
     }
 
     @Test
