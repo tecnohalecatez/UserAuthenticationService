@@ -24,7 +24,8 @@ INSERT INTO service.roles (name, description) VALUES
     ('ADMIN', 'Administrador'),
     ('USER', 'Usuario'),
     ('SUPERVISOR', 'Supervisor'),
-    ('ADVISER', 'Asesor');
+    ('ADVISER', 'Asesor'),
+    ('CLIENT', 'Cliente');
 
 ALTER TABLE service.users ADD COLUMN role_id INTEGER NOT NULL DEFAULT 1;
 ALTER TABLE service.users ADD COLUMN password VARCHAR(100) NOT NULL DEFAULT '123456';
