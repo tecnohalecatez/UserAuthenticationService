@@ -18,14 +18,14 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.*;
 
 import org.springframework.validation.Validator;
 
@@ -97,7 +97,12 @@ class UserRouterRestTest {
         when(userDTOMapper.toModel(testUserDataDTO)).thenReturn(testUserOne);
         when(userUseCase.saveUser(any(User.class))).thenReturn(Mono.just(testUserOne));
         when(userDTOMapper.toResponse(testUserOne)).thenReturn(expectedUserDTO);
-        webTestClient.post()
+        webTestClient
+                .mutateWith(SecurityMockServerConfigurers.mockJwt().jwt(jwt -> {
+                    jwt.subject("user@domain.com");
+                    jwt.claim("role", "ROLE_ADMIN");
+                }))
+                .post()
                 .uri(users)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(testUserDataDTO)
@@ -110,7 +115,12 @@ class UserRouterRestTest {
         UserDTO expectedUserDTO = new UserDTO(BigInteger.ONE, "John", "Doe", LocalDate.of(1990, 1, 1), "123 Main St", "555-1234", "john.doe@example.com", 50000.0);
         when(userUseCase.getUserById(BigInteger.ONE)).thenReturn(Mono.just(testUserOne));
         when(userDTOMapper.toResponse(testUserOne)).thenReturn(expectedUserDTO);
-        webTestClient.get()
+        webTestClient
+                .mutateWith(SecurityMockServerConfigurers.mockJwt().jwt(jwt -> {
+                    jwt.subject("user@domain.com");
+                    jwt.claim("role", "ADMIN");
+                }))
+                .get()
                 .uri(users + "/1")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -118,12 +128,18 @@ class UserRouterRestTest {
                 .expectBody(UserDTO.class)
                 .value(userDTO ->
                         Assertions.assertThat(userDTO.id()).isEqualTo(BigInteger.ONE));
+
     }
 
     @Test
     void listenGetUserByIdReturnsNotFound() {
         when(userUseCase.getUserById(BigInteger.valueOf(999))).thenReturn(Mono.empty());
-        webTestClient.get()
+        webTestClient
+                .mutateWith(SecurityMockServerConfigurers.mockJwt().jwt(jwt -> {
+                    jwt.subject("user@domain.com");
+                    jwt.claim("role", "ADMIN");
+                }))
+                .get()
                 .uri(users + "/999")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -138,7 +154,12 @@ class UserRouterRestTest {
         when(userDTOMapper.toModel(testUserDataDTO)).thenReturn(testUserOne);
         when(userUseCase.saveUser(any(User.class))).thenReturn(Mono.just(testUserOne));
         when(userDTOMapper.toResponse(testUserOne)).thenReturn(expectedUserDTO);
-        webTestClient.put()
+        webTestClient
+                .mutateWith(SecurityMockServerConfigurers.mockJwt().jwt(jwt -> {
+                    jwt.subject("user@domain.com");
+                    jwt.claim("role", "ADMIN");
+                }))
+                .put()
                 .uri(users + "/1")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(testUserDataDTO)
@@ -153,7 +174,12 @@ class UserRouterRestTest {
     void listenDeleteUserByIdReturnsNoContent() {
         when(userUseCase.getUserById(BigInteger.ONE)).thenReturn(Mono.just(testUserOne));
         when(userUseCase.deleteUserById(BigInteger.ONE)).thenReturn(Mono.empty());
-        webTestClient.delete()
+        webTestClient
+                .mutateWith(SecurityMockServerConfigurers.mockJwt().jwt(jwt -> {
+                    jwt.subject("user@domain.com");
+                    jwt.claim("role", "ROLE_ADMIN");
+                }))
+                .delete()
                 .uri(users + "/1")
                 .exchange()
                 .expectStatus().isNoContent();
@@ -166,7 +192,12 @@ class UserRouterRestTest {
         when(userUseCase.findAllUsers()).thenReturn(Flux.just(testUserOne, testUserTwo));
         when(userDTOMapper.toResponse(testUserOne)).thenReturn(userDTO1);
         when(userDTOMapper.toResponse(testUserTwo)).thenReturn(userDTO2);
-        webTestClient.get()
+        webTestClient
+                .mutateWith(SecurityMockServerConfigurers.mockJwt().jwt(jwt -> {
+                    jwt.subject("user@domain.com");
+                    jwt.claim("role", "ADMIN");
+                }))
+                .get()
                 .uri(users)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
